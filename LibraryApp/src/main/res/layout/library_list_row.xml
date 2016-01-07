@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="150dp">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:id="@+id/imageRow"
+        android:src = "@drawable/content"
+        android:focusable="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="7dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Title"
+        android:id="@+id/titleRow"
+        android:gravity="left"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageRow"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Neil Gaiman"
+        android:id="@+id/authorRow"
+        android:layout_below="@+id/titleRow"
+        android:layout_alignLeft="@+id/titleRow"
+        android:layout_alignStart="@+id/titleRow"
+        android:layout_marginTop="8dp" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressRow"
+        android:max="100"
+        android:indeterminate="false"
+        android:progress="50"
+        android:layout_alignWithParentIfMissing="false"
+        android:layout_below="@+id/daysLeft"
+        android:layout_alignLeft="@+id/daysLeft"
+        android:layout_alignStart="@+id/daysLeft" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Days Left: 7"
+        android:id="@+id/daysLeft"
+        android:layout_below="@+id/authorRow"
+        android:layout_alignLeft="@+id/authorRow"
+        android:layout_alignStart="@+id/authorRow"
+        android:layout_marginTop="20dp" />
+
+</RelativeLayout>

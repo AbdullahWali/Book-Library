@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:fitsSystemWindows="true"
+    tools:activity="com.mocklibraryapplication.BookDetails">
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:src="@android:drawable/ic_menu_save"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Title"
+        android:id="@+id/titleRow"
+        android:gravity="left"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@+id/imageRow"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Author"
+        android:id="@+id/authorRow"
+        android:gravity="left"
+        android:layout_below="@+id/titleRow"
+        android:layout_alignLeft="@+id/titleRow"
+        android:layout_alignStart="@+id/titleRow" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Page Count"
+        android:id="@+id/pageCount"
+        android:gravity="left"
+        android:layout_below="@+id/authorRow"
+        android:layout_alignLeft="@+id/authorRow"
+        android:layout_alignStart="@+id/authorRow"
+        android:layout_marginTop="0dp" />
+
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollIndicators="right"
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView"
+        android:layout_below="@+id/overview"
+        android:layout_alignLeft="@+id/imageRow"
+        android:layout_alignStart="@+id/imageRow"
+        android:layout_alignRight="@+id/fab"
+        android:layout_alignEnd="@+id/fab"
+        android:layout_above="@+id/fab"
+        android:layout_marginBottom="7dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Description"
+            android:id="@+id/description"
+            android:gravity="center" />
+    </ScrollView>
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:id="@+id/imageRow"
+        android:src = "@drawable/content"
+        android:focusable="false"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="10dp" />
+
+    <RatingBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:isIndicator="true"
+        android:id="@+id/ratingBar"
+        android:numStars="5"
+        style="?android:ratingBarStyleIndicator"
+        android:rating="3"
+        android:layout_below="@+id/pageCount"
+        android:layout_alignLeft="@+id/pageCount"
+        android:layout_alignStart="@+id/pageCount" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Overview"
+        android:textStyle="bold"
+        android:layout_below="@+id/imageRow"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/overview"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="0dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="(0)"
+        android:id="@+id/ratingCount"
+        android:layout_alignBottom="@+id/ratingBar"
+        android:layout_alignLeft="@+id/fab"
+        android:layout_alignStart="@+id/fab"
+        android:layout_alignParentTop="false"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="20dp" />
+
+</RelativeLayout>
