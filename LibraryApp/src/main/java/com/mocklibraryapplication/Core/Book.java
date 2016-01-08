@@ -1,6 +1,5 @@
 package com.mocklibraryapplication.Core;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -15,17 +14,17 @@ public class Book implements Parcelable {
     private double rating;
     private int ratingCount;
     private int pageCount;
-    private  Bitmap image;
+    private String imageURL;
     private String overview;
 
-    public Book(String title, String author, String isbn, double rating, int ratingCount, int pageCount, Bitmap image, String overview) {
+    public Book(String title, String author, String isbn, double rating, int ratingCount, int pageCount, String imageURL, String overview) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
         this.rating = rating;
         this.ratingCount = ratingCount;
         this.pageCount = pageCount;
-        this.image = image;
+        this.imageURL = imageURL;
         this.overview = overview;
     }
 
@@ -35,7 +34,7 @@ public class Book implements Parcelable {
         isbn = "0";
         pageCount = 0;
         overview = null;
-        image = null;
+        imageURL = null;
     }
 
 
@@ -58,12 +57,12 @@ public class Book implements Parcelable {
         this.ratingCount = ratingCount;
     }
 
-    public Bitmap getImage() {
-        return image;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setImage(Bitmap image) {
-        this.image = image;
+    public void setImageURL(String image) {
+        this.imageURL = image;
     }
 
     public String getTitle() {
@@ -116,7 +115,7 @@ public class Book implements Parcelable {
                 ", rating=" + rating +
                 ", ratingCount=" + ratingCount +
                 ", pageCount=" + pageCount +
-                ", image=" + image +
+                ", imageURL=" + imageURL +
                 ", overview='" + overview + '\'' +
                 '}';
     }
@@ -134,7 +133,7 @@ public class Book implements Parcelable {
         dest.writeDouble(this.rating);
         dest.writeInt(this.ratingCount);
         dest.writeInt(this.pageCount);
-        dest.writeParcelable(this.image, 0);
+        dest.writeString(this.imageURL);
         dest.writeString(this.overview);
     }
 
@@ -145,7 +144,7 @@ public class Book implements Parcelable {
         this.rating = in.readDouble();
         this.ratingCount = in.readInt();
         this.pageCount = in.readInt();
-        this.image = in.readParcelable(Bitmap.class.getClassLoader());
+        this.imageURL = in.readString();
         this.overview = in.readString();
     }
 

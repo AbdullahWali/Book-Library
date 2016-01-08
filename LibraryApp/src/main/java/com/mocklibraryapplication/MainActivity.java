@@ -2,8 +2,7 @@ package com.mocklibraryapplication;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.design.widget.FloatingActionButton;
@@ -26,19 +25,20 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mocklibraryapplication.Core.Book;
 import com.mocklibraryapplication.Core.Entry;
 import com.mocklibraryapplication.Core.Library;
 import com.mocklibraryapplication.barcodereader.BarcodeCaptureActivity;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,11 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_BOOK_DETAILS = 1;
 
 
-    Library myLibrary = new Library() ;
+    Library myLibrary; // = new Library() ;
     FloatingActionButton readBarcode;
     ListView bookList;
     LibraryListAdapter adapter;
-    final String TAG = "MainActivity";
+    final static String TAG = "MainActivity";
     String url;
     View mainView;
 
@@ -69,35 +69,35 @@ public class MainActivity extends AppCompatActivity {
         bookList = (ListView) findViewById( R.id.bookList);
         mainView = (View) findViewById(R.id.parentViewMain);
 
-        /*
+
         //If Library is available in SharedPref, Import it, otherwise Create a new Library
         SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
-        Gson gson = new Gson(); //Use GSON to convert from JSON to Object
+        Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
         String json = mPrefs.getString("Library", "");
-        longInfo(json);
         Library tempLibrary = gson.fromJson(json, Library.class);
         if ( tempLibrary == null ) { myLibrary = new Library(); Log.d("GSONDebug", "Created New Library"); }
         else { myLibrary = tempLibrary;  Log.d("GSONDebug", "Imported Library"); }
-        */
+
 
         //Set Adapter for bookList
         adapter = new LibraryListAdapter(this,myLibrary.getLibrary());
         bookList.setAdapter(adapter);
 
-        //Give URL Default Value
-        url = " ";
+        // launch barcode activity.
+        url = " "; //Give URL Default Value
         readBarcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // launch barcode activity.
                 Intent intent = new Intent(MainActivity.this, BarcodeCaptureActivity.class);
-                intent.putExtra(BarcodeCaptureActivity.AutoFocus, true);
-                intent.putExtra(BarcodeCaptureActivity.UseFlash, false);
+                intent.putExtra(BarcodeCaptureActivity.AutoFocus, true); //Set auto-focus on
+                intent.putExtra(BarcodeCaptureActivity.UseFlash, false); //Set flash off
                 startActivityForResult(intent, RC_BARCODE_CAPTURE);
 
             }
         });
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -180,11 +180,9 @@ public class MainActivity extends AppCompatActivity {
 
 
                                         String imageURLString = response.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
-                                        URL imageURL = new URL ( imageURLString);
-                                        Bitmap image = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
 
                                         //Create Book From Extracted Info
-                                        Book book = new Book ( title, author,isbn,rating, ratingCount, pageCount, image, overview);
+                                        Book book = new Book ( title, author,isbn,rating, ratingCount, pageCount, imageURLString, overview);
 
                                         //Show the Button again
                                         readBarcode.show();
@@ -195,10 +193,6 @@ public class MainActivity extends AppCompatActivity {
                                         startActivityForResult(intent, RC_BOOK_DETAILS);
 
                                     } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    } catch (MalformedURLException e) {
-                                        e.printStackTrace();
-                                    } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                 }
@@ -275,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
             title.setText(list.get(position).getBook().getTitle());
             author.setText(list.get(position).getBook().getAuthor());
-            image.setImageBitmap(list.get(position).getBook().getImage());
+            Picasso.with(getContext()).load(list.get(position).getBook().getImageURL()).into(image);
             daysLeft.setText("Days Left: "  + list.get(position).getDaysLeft());
             progressBar.setProgress(list.get(position).getPercentDaysPassed());
             return rowView;
@@ -286,28 +280,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        /*
+
         //Save Library data to Shared preferences
         //-----------------------------------------------------------
         SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
 
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
-        Gson gson = new Gson();   //Convert To JSON to store in SharedPref.
+        Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
         String json = gson.toJson(myLibrary); //
         prefsEditor.putString("Library", json);
         prefsEditor.commit();
 
         //-----------------------------------------------------------
-        */
+
     }
 
-    public static void longInfo(String str) {
-        if(str.length() > 4000) {
-            Log.i("GSONDebug", str.substring(0, 4000));
-            longInfo(str.substring(4000));
-        } else
-            Log.i("GSONDebug", str);
-    }
 }
 
 

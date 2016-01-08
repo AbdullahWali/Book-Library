@@ -339,7 +339,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity {
      */
     private boolean onTap(float rawX, float rawY) {
 
-        //TODO: use the tap position to select the barcode.
+        //use the tap position to select the barcode.
         BarcodeGraphic graphic = mGraphicOverlay.getFirstGraphic();
         Barcode barcode = null;
         if (graphic != null) {

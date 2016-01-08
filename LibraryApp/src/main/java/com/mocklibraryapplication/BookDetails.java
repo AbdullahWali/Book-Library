@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.mocklibraryapplication.Core.Book;
+import com.squareup.picasso.Picasso;
 
 public class BookDetails extends AppCompatActivity {
 
@@ -106,10 +107,11 @@ public class BookDetails extends AppCompatActivity {
         if (book != null) {
             title.setText ( book.getTitle());
             author.setText(book.getAuthor());
-            pageCount.setText(Integer.toString(book.getPageCount() ) + " pages");
+            pageCount.setText(Integer.toString(book.getPageCount()) + " pages");
             description.setText(book.getOverview());
-            image.setImageBitmap(book.getImage());
-            rating.setRating((float)book.getRating());
+            Picasso.with(this).setIndicatorsEnabled(true);
+            Picasso.with(this).load(book.getImageURL()).into(image);
+            rating.setRating((float) book.getRating());
             ratingCount.setText("(" +Integer.toString(book.getRatingCount()) +")");
         }
 
