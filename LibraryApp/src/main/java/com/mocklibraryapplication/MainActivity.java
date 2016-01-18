@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pending = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(System.currentTimeMillis());
-        cal.setTimeInMillis(cal.getTimeInMillis() + 5 * 1000); //5 Seconds from now
-        AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY, pending);
+        cal.setTimeInMillis(cal.getTimeInMillis() + 1000); //5 Seconds from now
+        AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), 1000 * 60 * 60 , pending); //12 Hour Interval
 
 
 

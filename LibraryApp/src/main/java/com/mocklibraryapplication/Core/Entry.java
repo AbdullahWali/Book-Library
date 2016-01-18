@@ -59,6 +59,8 @@ public class Entry {
     }
 
     public int getDaysLeft() {
+        if (Days.daysBetween(new LocalDate() , dueDate).getDays() <0 )
+            return 0;
         return Days.daysBetween(new LocalDate() , dueDate).getDays();
     }
 
