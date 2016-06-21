@@ -31,16 +31,19 @@ public class BookDetails extends AppCompatActivity {
 
 
         // Initialise Objects from XML
-        TextView title = (TextView) findViewById( R.id.titleRow);
-        TextView author = ( TextView) findViewById( R.id.authorRow);
-        TextView pageCount = (TextView) findViewById( R.id.pageCount);
+        TextView title = (TextView) findViewById(R.id.titleRow);
+        TextView author = (TextView) findViewById(R.id.authorRow);
+        TextView pageCount = (TextView) findViewById(R.id.pageCount);
         TextView description = (TextView) findViewById(R.id.description);
         ImageView image = (ImageView) findViewById(R.id.imageRow);
-        RatingBar rating = ( RatingBar ) findViewById(R.id.ratingBar);
+        RatingBar rating = (RatingBar) findViewById(R.id.ratingBar);
         TextView ratingCount = (TextView) findViewById(R.id.ratingCount);
 
-        //Save Button
+
+        //Save Button: Show only if Activity was started to add a new Book
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
+        if (!getIntent().getExtras().getBoolean("ShowSave")) fab.hide();
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,6 +70,7 @@ public class BookDetails extends AppCompatActivity {
                             numOfDays[0] = numPicker.getValue();
                     }
                 });
+
 
                 //Get Number from Dialog and finish Activity
                 AlertDialog dialog = new AlertDialog.Builder(BookDetails.this, AlertDialog.THEME_HOLO_DARK)
@@ -95,7 +99,6 @@ public class BookDetails extends AppCompatActivity {
             }
         });
 
-
         // Extract Book Info from Calling Activity
         Intent intent = getIntent();
         book = (Book) intent.getExtras().get("Book");
@@ -105,14 +108,13 @@ public class BookDetails extends AppCompatActivity {
 
         //Populate View with Book Info
         if (book != null) {
-            title.setText ( book.getTitle());
+            title.setText(book.getTitle());
             author.setText(book.getAuthor());
             pageCount.setText(Integer.toString(book.getPageCount()) + " pages");
             description.setText(book.getOverview());
-            Picasso.with(this).setIndicatorsEnabled(true);
             Picasso.with(this).load(book.getImageURL()).into(image);
             rating.setRating((float) book.getRating());
-            ratingCount.setText("(" +Integer.toString(book.getRatingCount()) +")");
+            ratingCount.setText("(" + Integer.toString(book.getRatingCount()) + ")");
         }
 
     }

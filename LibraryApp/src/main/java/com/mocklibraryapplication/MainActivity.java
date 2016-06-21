@@ -2,17 +2,15 @@ package com.mocklibraryapplication;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -58,13 +57,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    Library myLibrary; // = new Library() ;
+    Library myLibrary; //
     FloatingActionButton readBarcode;
     static ListView bookList;
     LibraryListAdapter adapter;
     final static String TAG = "MainActivity";
     String url;
     View mainView;
+    LinearLayout introImage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,10 +80,11 @@ public class MainActivity extends AppCompatActivity {
         readBarcode = (FloatingActionButton) findViewById(R.id.button);
         bookList = (ListView) findViewById( R.id.bookList);
         mainView = (View) findViewById(R.id.parentViewMain);
+        introImage = (LinearLayout) findViewById(R.id.introImage);
 
 
         //If Library is available in SharedPref, Import it, otherwise Create a new Library
-        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
         String json = mPrefs.getString("Library", "");
         Library tempLibrary = gson.fromJson(json, Library.class);
@@ -100,29 +102,29 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pending = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(System.currentTimeMillis());
-        cal.setTimeInMillis(cal.getTimeInMillis() + 1000); //5 Seconds from now
-        AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), 1000 * 60 * 60 , pending); //12 Hour Interval
+        cal.setTimeInMillis(cal.getTimeInMillis() + 5000); //5 Seconds from now
+        AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY , pending); //12 Hour Interval
 
 
 
-        //Click Listener for Listview
-        //TODO: Change ItemclickListener to open another Activity
+        //Click Listener for Listview: Check Book Details again
+
         bookList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Book curBook = ((Entry) (bookList.getItemAtPosition(position))).getBook();
 
-                Notification bookNotification = new NotificationCompat.Builder(getApplicationContext())
-                        .setContentTitle("Return Book Soon")
-                        .setContentText(curBook.getTitle() + " is due in " + ((Entry) (bookList.getItemAtPosition(position))).getDaysLeft() + " days")
-                        .setSmallIcon(R.drawable.ic_book_white_18dp)
-                        .build();
+                Intent intent = new Intent(MainActivity.this,BookDetails.class );
+                intent.putExtra("ShowSave", false);
+                intent.putExtra ("Book", curBook);
+                startActivityForResult(intent, RC_BOOK_DETAILS);
 
-                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                notificationManager.notify(NOTIFICATION_ID, bookNotification);
+                //BookDetailsDialog.newInstance(curBook).show(getFragmentManager(), null);
 
             }
         });
+
+        //TODO: Add Long Click Listener and open a menu with options to remove book or change date
 
         // launch barcode activity.
         url = " "; //Give URL Default Value
@@ -138,7 +140,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //If library is empty display IntroImage
+        if (myLibrary.getLibrary().isEmpty() ) introImage.setVisibility(View.VISIBLE);
+        else introImage.setVisibility(View.INVISIBLE);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -190,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Returning from Activity: BarcodeCapture
         if (requestCode == RC_BARCODE_CAPTURE) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (data != null) {
@@ -201,7 +210,6 @@ public class MainActivity extends AppCompatActivity {
                             + "&key" + R.string.Google_API;
 
                     /// Make a JSON Request And Post Results to TEXTBOX
-
                     JsonObjectRequest jsonrequest = new JsonObjectRequest
                             (Request.Method.GET, url, (String) null, new Response.Listener<JSONObject>() {
                                 @Override
@@ -218,8 +226,6 @@ public class MainActivity extends AppCompatActivity {
                                         int ratingCount = response.getJSONObject("volumeInfo").getInt("ratingsCount");
                                         int pageCount = response.getJSONObject("volumeInfo").getInt("pageCount");
                                         String overview = response.getJSONObject("volumeInfo").getString("description");
-
-
                                         String imageURLString = response.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
 
                                         //Create Book From Extracted Info
@@ -227,9 +233,9 @@ public class MainActivity extends AppCompatActivity {
 
                                         //Show the Button again
                                         readBarcode.show();
-
                                         //Start Book Details Activity
                                         Intent intent = new Intent(MainActivity.this,BookDetails.class );
+                                        intent.putExtra("ShowSave", true);
                                         intent.putExtra ("Book", book);
                                         startActivityForResult(intent, RC_BOOK_DETAILS);
 
@@ -255,10 +261,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "No barcode captured, intent data is null");
                 }
             } else {
-
                 CommonStatusCodes.getStatusCodeString(resultCode);
             }
         }
+
+        //Returning From Activity: BookDetails
         else if (requestCode == RC_BOOK_DETAILS ) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if ( data != null ) {
@@ -324,13 +331,12 @@ public class MainActivity extends AppCompatActivity {
 
         //Save Library data to Shared preferences
         //-----------------------------------------------------------
-        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
-
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
         Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
         String json = gson.toJson(myLibrary); //
         prefsEditor.putString("Library", json);
-        prefsEditor.commit();
+        prefsEditor.apply();
 
         //-----------------------------------------------------------
 
