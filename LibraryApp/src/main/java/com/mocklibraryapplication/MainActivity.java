@@ -1,9 +1,5 @@
 package com.mocklibraryapplication;
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,18 +9,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -40,28 +32,22 @@ import com.mocklibraryapplication.Core.Book;
 import com.mocklibraryapplication.Core.Entry;
 import com.mocklibraryapplication.Core.Library;
 import com.mocklibraryapplication.barcodereader.BarcodeCaptureActivity;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final int RC_BOOK_DETAILS = 1;
-    private static final int NOTIFICATION_ID = 5411;
+   // private static final int NOTIFICATION_ID = 5411;
 
-
-
-
-    Library myLibrary; //
-    FloatingActionButton readBarcode;
-    static ListView bookList;
-    LibraryListAdapter adapter;
     final static String TAG = "MainActivity";
+
+    Library myLibrary;
+    FloatingActionButton readBarcode;
+    ListView bookList;
+    LibraryListAdapter adapter;
     String url;
     View mainView;
     LinearLayout introImage;
@@ -82,30 +68,19 @@ public class MainActivity extends AppCompatActivity {
         mainView = (View) findViewById(R.id.parentViewMain);
         introImage = (LinearLayout) findViewById(R.id.introImage);
 
-
         //If Library is available in SharedPref, Import it, otherwise Create a new Library
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
-        String json = mPrefs.getString("Library", "");
-        Library tempLibrary = gson.fromJson(json, Library.class);
-        if ( tempLibrary == null ) { myLibrary = new Library(); Log.d("GSONDebug", "Created New Library"); }
-        else { myLibrary = tempLibrary;  Log.d("GSONDebug", "Imported Library"); }
+        Library tempLibrary = Utilities.loadLibraryFromPref(getApplicationContext());
+        if ( tempLibrary == null ) myLibrary = new Library();
+        else myLibrary = tempLibrary;
 
 
-        //Set Adapter for bookList
+        //Set Adapter for bookList and register for context menu
         adapter = new LibraryListAdapter(this,myLibrary.getLibrary());
         bookList.setAdapter(adapter);
+        registerForContextMenu(bookList);
 
-        //Set Notifications AlarmManager
-        AlarmManager AM = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        Intent notificationIntent = new Intent (this, NotificationAlarmReceiver.class);
-        PendingIntent pending = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(System.currentTimeMillis());
-        cal.setTimeInMillis(cal.getTimeInMillis() + 5000); //5 Seconds from now
-        AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY , pending); //12 Hour Interval
-
-
+        //Set AlarmManager
+        Utilities.setAlarmIfRequired(getApplicationContext());
 
         //Click Listener for Listview: Check Book Details again
 
@@ -113,19 +88,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Book curBook = ((Entry) (bookList.getItemAtPosition(position))).getBook();
-
                 Intent intent = new Intent(MainActivity.this,BookDetails.class );
                 intent.putExtra("ShowSave", false);
                 intent.putExtra ("Book", curBook);
                 startActivityForResult(intent, RC_BOOK_DETAILS);
-
-                //BookDetailsDialog.newInstance(curBook).show(getFragmentManager(), null);
-
             }
         });
 
         //TODO: Add Long Click Listener and open a menu with options to remove book or change date
-
         // launch barcode activity.
         url = " "; //Give URL Default Value
         readBarcode.setOnClickListener(new View.OnClickListener() {
@@ -138,6 +108,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_activity_context_menu, menu);
     }
 
     @Override
@@ -155,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -169,8 +147,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
 
 
 
@@ -241,6 +217,9 @@ public class MainActivity extends AppCompatActivity {
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
+                                        Snackbar.make(mainView, "Did not find Book on server...", Snackbar.LENGTH_LONG).show();
+                                        readBarcode.show();
+
                                     }
                                 }
                             }, new Response.ErrorListener() {
@@ -283,46 +262,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    //Adapter class for Book List
-    private class LibraryListAdapter extends ArrayAdapter <Entry> {
-
-
-        private final Activity activity;
-        private ArrayList<Entry> list;
-
-        public LibraryListAdapter(Activity activity, ArrayList<Entry> library) {
-            super(activity, R.layout.library_list_row, library);
-            this.activity = activity;
-            this.list = library;
-        }
-
-        @Override
-        public int getCount() {
-            return list.size();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View rowView = convertView;
-
-            if (rowView == null )
-                rowView= LayoutInflater.from(activity).inflate(R.layout.library_list_row, parent, false);
-
-            TextView title = (TextView) rowView.findViewById(R.id.titleRow);
-            TextView author = (TextView) rowView.findViewById(R.id.authorRow);
-            TextView daysLeft = (TextView) rowView.findViewById(R.id.daysLeft);
-            ImageView image = (ImageView) rowView.findViewById(R.id.imageRow);
-            ProgressBar progressBar = (ProgressBar) rowView.findViewById(R.id.progressRow);
-
-            title.setText(list.get(position).getBook().getTitle());
-            author.setText(list.get(position).getBook().getAuthor());
-            Picasso.with(getContext()).load(list.get(position).getBook().getImageURL()).into(image);
-            daysLeft.setText("Days Left: "  + list.get(position).getDaysLeft());
-            progressBar.setProgress(list.get(position).getPercentDaysPassed());
-            return rowView;
-        }
+    public void returnBook(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final Entry entryToRemove = (Entry) bookList.getItemAtPosition(info.position);
+        myLibrary.removeEntry(entryToRemove);
+        adapter.notifyDataSetChanged();
+        Snackbar snackbar = Snackbar.make(mainView,"Entry was deleted...",Snackbar.LENGTH_LONG).setAction("UNDO", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myLibrary.addEntry(entryToRemove);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        snackbar.show();
     }
+
 
     @Override
     protected void onPause() {
@@ -337,7 +291,6 @@ public class MainActivity extends AppCompatActivity {
         String json = gson.toJson(myLibrary); //
         prefsEditor.putString("Library", json);
         prefsEditor.apply();
-
         //-----------------------------------------------------------
 
     }

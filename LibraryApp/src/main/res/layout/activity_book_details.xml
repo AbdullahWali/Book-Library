@@ -56,9 +56,7 @@
 
     <ScrollView
         android:layout_width="wrap_content"
-        android:scrollbars="vertical"
         android:scrollbarStyle="outsideOverlay"
-        android:scrollIndicators="right"
         android:layout_height="match_parent"
         android:id="@+id/scrollView"
         android:layout_below="@+id/overview"
@@ -70,7 +68,8 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:scrollIndicators="right">
 
         <TextView
             android:layout_width="match_parent"
@@ -125,10 +124,9 @@
         android:text="(0)"
         android:id="@+id/ratingCount"
         android:layout_alignBottom="@+id/ratingBar"
-        android:layout_alignLeft="@+id/fab"
-        android:layout_alignStart="@+id/fab"
         android:layout_alignParentTop="false"
-        android:layout_marginBottom="7dp"
-        android:layout_marginLeft="20dp" />
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="60dp"
+        android:layout_alignRight="@+id/scrollView" />
 
 </RelativeLayout>

@@ -2,17 +2,13 @@ package com.mocklibraryapplication;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.fatboyindustrial.gsonjodatime.Converters;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mocklibraryapplication.Core.Entry;
 import com.mocklibraryapplication.Core.Library;
 
@@ -21,34 +17,30 @@ import java.util.ArrayList;
 public class NotificationAlarmReceiver extends BroadcastReceiver {
 
     private static final int NOTIFICATION_ID = 5413;
-
+    private static int DAYS_LEFT_NOTIFY = 5; //Notify when DAYS_LEFT_NOTIFY days are left before Deadline
     public NotificationAlarmReceiver() {
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO: Change <= 20 to some method
-        // an Intent broadcast.
 
-        //TODO: Accessing MainActivity sometimes gives a NullPointerExeption, Solve by importing the booklist from the SharedPref
+        //Set Alarm After Boot
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            Utilities.setAlarmIfRequired(context);
+        }
 
-        String text = "";
         ArrayList<String> notificationList = new ArrayList<String>();
 
-
-
         //Import Library from SharedPrefs
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-        Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
-        String json = mPrefs.getString("Library", "");
-        Library tempLibrary = gson.fromJson(json, Library.class);
+        Library tempLibrary = Utilities.loadLibraryFromPref(context);
         if (tempLibrary == null) {
             Log.d(this.getClass().getSimpleName(), "No Library imported");
             return;
         }
 
+        // TODO: Add setting for DAYS_LEFT_NOTIFY
         for ( Entry entry : tempLibrary.getLibrary()) {
-            if (entry.getDaysLeft() <= 20) {
+            if (entry.getDaysLeft() <= DAYS_LEFT_NOTIFY) {
                 notificationList.add (entry.getBook().getTitle() + " is due in " + entry.getDaysLeft() + " days");
             }
         }
@@ -57,7 +49,7 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
         if (!notificationList.isEmpty()) {
 
-            //TODO: Add Intent for the Notification To go to an Activity
+            //TODO: Change intent so that it wouldn't create new activity if it is already started
             //Set an Inbox Style for notifications
             NotificationCompat.InboxStyle inboxStyle =
                     new NotificationCompat.InboxStyle();
@@ -68,12 +60,30 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
             // Sets a title for the Inbox in expanded layout
             inboxStyle.setBigContentTitle("You Have Unreturned Books: ");
 
+            Intent returnIntent = new Intent(context.getApplicationContext() , MainActivity.class);
+            returnIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent pendingIntent =
+                    PendingIntent.getActivity(
+                            context.getApplicationContext(),
+                            0,
+                            returnIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+
             Notification bookNotification = new NotificationCompat.Builder(context)
                     .setContentTitle("You Have Unreturned Books")
-                    .setContentText(text)
                     .setSmallIcon(R.drawable.ic_book_white_18dp)
                     .setStyle(inboxStyle)
+                    .setContentIntent(pendingIntent)
+                    .setLights(0xff00ff00,1000,100)
+                    .setAutoCancel(true)
                     .build();
+
+            //Add Vibrate, Sound, and Lights
+            bookNotification.defaults |= Notification.DEFAULT_VIBRATE;
+            bookNotification.defaults |= Notification.DEFAULT_SOUND;
+
+
 
             //Notify
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
