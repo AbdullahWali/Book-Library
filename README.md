@@ -24,3 +24,6 @@ The Following Libraries were used in the application
 * [Picasso] (http://square.github.io/picasso/)
 * [Joda Time] (http://www.joda.org/joda-time/)
 * [Google GSON] (https://github.com/google/gson)
+
+
+Copyright 2016 Abdullah Wali
