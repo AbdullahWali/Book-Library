@@ -3,5 +3,6 @@
     <item android:title="Return Book"
           android:id="@+id/returnBook"
           android:onClick="returnBook"/>
-    <item android:title="Change Date"/>
+    <item android:title="Change Date"
+          android:onClick="changeDate"/>
 </menu>

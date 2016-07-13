@@ -24,10 +24,8 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        //Set Alarm After Boot
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Utilities.setAlarmIfRequired(context);
-        }
+        //Set Alarm After Reboot
+        Utilities.setAlarmIfRequired(context);
 
         ArrayList<String> notificationList = new ArrayList<String>();
 
@@ -49,7 +47,6 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
         if (!notificationList.isEmpty()) {
 
-            //TODO: Change intent so that it wouldn't create new activity if it is already started
             //Set an Inbox Style for notifications
             NotificationCompat.InboxStyle inboxStyle =
                     new NotificationCompat.InboxStyle();

@@ -51,7 +51,8 @@ public class LibraryListAdapter extends ArrayAdapter<Entry> {
         title.setText(list.get(position).getBook().getTitle());
         author.setText(list.get(position).getBook().getAuthor());
         Picasso.with(getContext()).load(list.get(position).getBook().getImageURL()).into(image);
-        daysLeft.setText("Days Left: "  + list.get(position).getDaysLeft());
+        String daysLeftString = activity.getString(R.string.daysLeft) + list.get(position).getDaysLeft();
+        daysLeft.setText(daysLeftString);
         progressBar.setProgress(list.get(position).getPercentDaysPassed());
         return rowView;
     }

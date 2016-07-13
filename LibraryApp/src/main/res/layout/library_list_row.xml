@@ -16,9 +16,14 @@
         android:layout_marginBottom="7dp" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:fontFamily="sans-serif-black"
+        android:textColor="#424242"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="middle"
         android:text="Title"
         android:id="@+id/titleRow"
         android:gravity="left"
@@ -27,18 +32,19 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="10dp"
         android:layout_centerInParent="true"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:fontFamily="sans-serif-medium"
         android:text="Neil Gaiman"
         android:id="@+id/authorRow"
         android:layout_below="@+id/titleRow"
         android:layout_alignLeft="@+id/titleRow"
         android:layout_alignStart="@+id/titleRow"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="12dp" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
@@ -62,6 +68,6 @@
         android:layout_below="@+id/authorRow"
         android:layout_alignLeft="@+id/authorRow"
         android:layout_alignStart="@+id/authorRow"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="15dp" />
 
 </RelativeLayout>

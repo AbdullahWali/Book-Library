@@ -7,7 +7,7 @@ import org.joda.time.LocalDate;
  * Created by Abdullah on 18/10/15.
  * The Entry will consist of a Book and additional user specific information: Borrow Date, Return Date, etc; It Will be used in the Library Class
  */
-public class Entry {
+public class Entry implements Comparable {
     Book book ;
     final LocalDate borrowDate; // Borrow Date immutable
     LocalDate dueDate;
@@ -74,5 +74,12 @@ public class Entry {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    @Override
+    public int compareTo(Object another) {
+        if ( this.getDaysLeft() > ((Entry)another).getDaysLeft()) return 1;
+        else if (this.getDaysLeft() < ((Entry) another).getDaysLeft()) return -1;
+        else return 0;
     }
 }

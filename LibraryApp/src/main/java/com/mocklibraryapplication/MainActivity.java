@@ -1,10 +1,8 @@
 package com.mocklibraryapplication;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -23,11 +21,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mocklibraryapplication.Core.Book;
 import com.mocklibraryapplication.Core.Entry;
 import com.mocklibraryapplication.Core.Library;
@@ -40,14 +35,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final int RC_BOOK_DETAILS = 1;
-   // private static final int NOTIFICATION_ID = 5411;
 
     final static String TAG = "MainActivity";
 
-    Library myLibrary;
+    static Library myLibrary;
     FloatingActionButton readBarcode;
     ListView bookList;
-    LibraryListAdapter adapter;
+    static LibraryListAdapter adapter;
     String url;
     View mainView;
     LinearLayout introImage;
@@ -95,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //TODO: Add Long Click Listener and open a menu with options to remove book or change date
         // launch barcode activity.
         url = " "; //Give URL Default Value
         readBarcode.setOnClickListener(new View.OnClickListener() {
@@ -198,8 +191,16 @@ public class MainActivity extends AppCompatActivity {
                                         String title = response.getJSONObject("volumeInfo").getString("title");
                                         String author = response.getJSONObject("volumeInfo").getJSONArray("authors").getString(0);
                                         String isbn = response.getJSONObject("volumeInfo").getJSONArray("industryIdentifiers").getJSONObject(0).getString("identifier");
-                                        double rating = response.getJSONObject("volumeInfo").getDouble("averageRating");
-                                        int ratingCount = response.getJSONObject("volumeInfo").getInt("ratingsCount");
+
+                                        double rating = 0.0;
+                                        int ratingCount = 0;
+                                        try {
+                                            rating = response.getJSONObject("volumeInfo").getDouble("averageRating");
+                                            ratingCount = response.getJSONObject("volumeInfo").getInt("ratingsCount");
+                                        }
+                                        catch (JSONException exception){
+                                            Log.d("JSON", exception.toString());
+                                        }
                                         int pageCount = response.getJSONObject("volumeInfo").getInt("pageCount");
                                         String overview = response.getJSONObject("volumeInfo").getString("description");
                                         String imageURLString = response.getJSONObject("volumeInfo").getJSONObject("imageLinks").getString("thumbnail");
@@ -217,7 +218,8 @@ public class MainActivity extends AppCompatActivity {
 
                                     } catch (JSONException e) {
                                         e.printStackTrace();
-                                        Snackbar.make(mainView, "Did not find Book on server...", Snackbar.LENGTH_LONG).show();
+                                        Log.d("JSON",e.toString());
+                                        Snackbar.make(mainView, "Could not parse Book info...", Snackbar.LENGTH_LONG).show();
                                         readBarcode.show();
 
                                     }
@@ -225,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
                             }, new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-
+                                    Snackbar.make(mainView, "Could not Connect to server..", Snackbar.LENGTH_LONG).show();
+                                    readBarcode.show();
                                 }
                             });
 
@@ -277,21 +280,16 @@ public class MainActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+    public void changeDate(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        DatePickerFragment datePickerFragment = DatePickerFragment.newInstance(info.position);
+        datePickerFragment.show(getFragmentManager(),"datePicker");
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-
-        //Save Library data to Shared preferences
-        //-----------------------------------------------------------
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-        Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
-        String json = gson.toJson(myLibrary); //
-        prefsEditor.putString("Library", json);
-        prefsEditor.apply();
-        //-----------------------------------------------------------
+        Utilities.saveLibraryToPref(getApplicationContext(),myLibrary);
 
     }
 

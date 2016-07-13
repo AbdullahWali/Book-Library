@@ -1,10 +1,12 @@
 package com.mocklibraryapplication;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.fatboyindustrial.gsonjodatime.Converters;
 import com.google.gson.Gson;
@@ -32,9 +34,10 @@ public class Utilities {
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(System.currentTimeMillis());
             cal.set(Calendar.HOUR_OF_DAY, 18); //Fire Alarm at 18:00
-            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.MINUTE, 00);
             cal.set(Calendar.SECOND,0);
-            AM.setInexactRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY , pending); //12 Hour Interval
+            Log.d("AlarmManager", cal.toString());
+            AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY , pending); //12 Hour Interval
         }
     }
 
@@ -45,6 +48,17 @@ public class Utilities {
         String json = mPrefs.getString("Library", "");
         Library tempLibrary = gson.fromJson(json, Library.class);
         return tempLibrary;
+    }
+
+    public static void saveLibraryToPref ( Context context , Library myLibrary) {
+
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        Gson gson =  Converters.registerLocalDate(new GsonBuilder()).create();   //Convert To JSON to store in SharedPref, using a library to parse jodatime (joda-time-serializer)
+        String json = gson.toJson(myLibrary); //
+        prefsEditor.putString("Library", json);
+        prefsEditor.apply();
+
     }
 
 }

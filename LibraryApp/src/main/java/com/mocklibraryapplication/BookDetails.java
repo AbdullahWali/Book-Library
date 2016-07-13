@@ -32,7 +32,9 @@ public class BookDetails extends AppCompatActivity {
 
         // Initialise Objects from XML
         TextView title = (TextView) findViewById(R.id.titleRow);
+        title.setSelected(true);
         TextView author = (TextView) findViewById(R.id.authorRow);
+        author.setSelected(true);
         TextView pageCount = (TextView) findViewById(R.id.pageCount);
         TextView description = (TextView) findViewById(R.id.description);
         ImageView image = (ImageView) findViewById(R.id.imageRow);
