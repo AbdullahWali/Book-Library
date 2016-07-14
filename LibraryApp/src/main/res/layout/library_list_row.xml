@@ -23,7 +23,7 @@
         android:textColor="#424242"
         android:textStyle="bold"
         android:maxLines="1"
-        android:ellipsize="middle"
+        android:ellipsize="end"
         android:text="Title"
         android:id="@+id/titleRow"
         android:gravity="left"
