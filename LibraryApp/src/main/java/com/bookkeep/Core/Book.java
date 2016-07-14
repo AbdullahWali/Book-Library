@@ -1,4 +1,4 @@
-package com.mocklibraryapplication.Core;
+package com.bookkeep.Core;
 
 import android.os.Parcel;
 import android.os.Parcelable;

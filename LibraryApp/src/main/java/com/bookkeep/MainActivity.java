@@ -1,4 +1,4 @@
-package com.mocklibraryapplication;
+package com.bookkeep;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,10 +23,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
-import com.mocklibraryapplication.Core.Book;
-import com.mocklibraryapplication.Core.Entry;
-import com.mocklibraryapplication.Core.Library;
-import com.mocklibraryapplication.barcodereader.BarcodeCaptureActivity;
+import com.bookkeep.Core.Book;
+import com.bookkeep.Core.Entry;
+import com.bookkeep.Core.Library;
+import com.bookkeep.barcodereader.BarcodeCaptureActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mocklibraryapplication.barcodereader.ui.camera;
+package com.bookkeep.barcodereader.ui.camera;
 
 import android.content.Context;
 import android.graphics.Canvas;

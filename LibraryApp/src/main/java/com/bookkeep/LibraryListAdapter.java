@@ -1,4 +1,4 @@
-package com.mocklibraryapplication;
+package com.bookkeep;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.mocklibraryapplication.Core.Entry;
+import com.bookkeep.Core.Entry;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

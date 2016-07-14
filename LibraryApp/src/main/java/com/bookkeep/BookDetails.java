@@ -1,4 +1,4 @@
-package com.mocklibraryapplication;
+package com.bookkeep;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,7 +16,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.mocklibraryapplication.Core.Book;
+import com.bookkeep.Core.Book;
 import com.squareup.picasso.Picasso;
 
 public class BookDetails extends AppCompatActivity {

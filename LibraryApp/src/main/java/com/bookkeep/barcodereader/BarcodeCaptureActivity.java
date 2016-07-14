@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mocklibraryapplication.barcodereader;
+package com.bookkeep.barcodereader;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -45,13 +45,13 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 //import com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSource;
 //import com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSourcePreview;
 //import com.google.android.gms.samples.vision.barcodereader.ui.camera.GraphicOverlay;
-import com.mocklibraryapplication.barcodereader.ui.camera.*;
+import com.bookkeep.barcodereader.ui.camera.*;
 
 //import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.mocklibraryapplication.R;
+import com.bookkeep.R;
 
 import java.io.IOException;
 
