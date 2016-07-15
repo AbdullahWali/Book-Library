@@ -14,4 +14,5 @@
     <string name="title_activity_book_details">Book Details</string>
     <string name="overview">Overview</string>
     <string name="daysLeft">"Days Left: "</string>
+    <string name="about">About</string>
 </resources>

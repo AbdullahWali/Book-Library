@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,8 +14,8 @@ import android.widget.NumberPicker;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.bookkeep.Core.Book;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.squareup.picasso.Picasso;
 
 public class BookDetails extends AppCompatActivity {
@@ -104,8 +103,6 @@ public class BookDetails extends AppCompatActivity {
         // Extract Book Info from Calling Activity
         Intent intent = getIntent();
         book = (Book) intent.getExtras().get("Book");
-
-        Log.e("BookDetails", book.toString());
 
 
         //Populate View with Book Info

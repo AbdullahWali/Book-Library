@@ -36,7 +36,6 @@ public class Utilities {
             cal.set(Calendar.HOUR_OF_DAY, 18); //Fire Alarm at 18:00
             cal.set(Calendar.MINUTE, 00);
             cal.set(Calendar.SECOND,0);
-            Log.d("AlarmManager", cal.toString());
             AM.setRepeating(AlarmManager.RTC, cal.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY , pending); //12 Hour Interval
         }
     }

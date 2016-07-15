@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.about) {
+            startActivity(new Intent(this,About.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -255,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
                     Book dataBook =(Book) data.getExtras().get("Book");
                     int numOfDays = data.getIntExtra("numOfDays" , 10 );
                     myLibrary.addEntry( new Entry(dataBook, numOfDays ));
-                    Log.d("MainActivity" , myLibrary.toString());
                     adapter.notifyDataSetChanged();
                 }
             }
